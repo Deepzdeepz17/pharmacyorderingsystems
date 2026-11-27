@@ -1,0 +1,13 @@
+# Visual Studio temporary files
+.vs/
+**/.vs/
+
+# Build output
+**/bin/
+**/obj/
+
+# Node modules
+**/node_modules/
+
+# Angular build output
+**/dist/
