@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using PharmacyAPI.DTOs.Category;
 using PharmacyAPI.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PharmacyAPI.Controllers
 {
     [Route("api/[controller]")]
+
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
