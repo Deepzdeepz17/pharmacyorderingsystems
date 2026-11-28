@@ -1,5 +1,7 @@
 
 using PharmacyAPI.DTOs.Medicine;
+using PharmacyAPI.DTOs.Stock;
+
 
 namespace PharmacyAPI.Interfaces
 {
@@ -14,5 +16,8 @@ namespace PharmacyAPI.Interfaces
         Task<MedicineResponseDto?> UpdateMedicineAsync(int id, CreateMedicineDto dto);
 
         Task<bool> DeleteMedicineAsync(int id);
+        Task<StockResponseDto> UpdateStockAsync(int medicineId, UpdateStockDto dto);
+
+        Task<List<StockResponseDto>> GetStockDetailsAsync();
     }
 }

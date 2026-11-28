@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PharmacyAPI.DTOs.Medicine;
+using PharmacyAPI.DTOs.Stock;
 using PharmacyAPI.Interfaces;
 
 namespace PharmacyAPI.Controllers
@@ -18,13 +19,14 @@ namespace PharmacyAPI.Controllers
             _medicineService = medicineService;
         }
 
-        // Add Medicine
+        // ADD MEDICINE
         [HttpPost]
         public async Task<IActionResult> CreateMedicine(CreateMedicineDto dto)
         {
             try
             {
                 var result = await _medicineService.CreateMedicineAsync(dto);
+
                 return CreatedAtAction(
                     nameof(GetMedicineById),
                     new { id = result.Id },
@@ -36,15 +38,16 @@ namespace PharmacyAPI.Controllers
             }
         }
 
-        // Get All Medicines
+        // GET ALL MEDICINES
         [HttpGet]
         public async Task<IActionResult> GetAllMedicines()
         {
             var result = await _medicineService.GetAllMedicinesAsync();
+
             return Ok(result);
         }
 
-        // Get Medicine By ID
+        // GET MEDICINE BY ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMedicineById(int id)
         {
@@ -56,7 +59,7 @@ namespace PharmacyAPI.Controllers
             return Ok(result);
         }
 
-        // Update Medicine
+        // UPDATE MEDICINE
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMedicine(
             int id, CreateMedicineDto dto)
@@ -76,7 +79,7 @@ namespace PharmacyAPI.Controllers
             }
         }
 
-        // Delete Medicine
+        // DELETE MEDICINE
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedicine(int id)
         {
@@ -85,7 +88,36 @@ namespace PharmacyAPI.Controllers
             if (!result)
                 return NotFound(new { message = "Medicine not found." });
 
-            return Ok(new { message = "Medicine deleted successfully." });
+            return Ok(new
+            {
+                message = "Medicine deleted successfully."
+            });
+        }
+
+        // UPDATE MEDICINE STOCK
+        [HttpPut("{id}/stock")]
+        public async Task<IActionResult> UpdateStock(
+            int id, UpdateStockDto dto)
+        {
+            try
+            {
+                var result = await _medicineService.UpdateStockAsync(id, dto);
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        // GET ALL STOCK DETAILS
+        [HttpGet("stock")]
+        public async Task<IActionResult> GetStockDetails()
+        {
+            var result = await _medicineService.GetStockDetailsAsync();
+
+            return Ok(result);
         }
     }
 }

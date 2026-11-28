@@ -1,5 +1,6 @@
 
 using PharmacyAPI.DTOs.Medicine;
+using PharmacyAPI.DTOs.Stock;
 using PharmacyAPI.Interfaces;
 using PharmacyAPI.Models;
 
@@ -18,6 +19,7 @@ namespace PharmacyAPI.Services
             _categoryRepository = categoryRepository;
         }
 
+        // CREATE MEDICINE
         public async Task<MedicineResponseDto> CreateMedicineAsync(
             CreateMedicineDto dto)
         {
@@ -43,6 +45,7 @@ namespace PharmacyAPI.Services
             return MapToDto(createdMedicine, category.Name);
         }
 
+        // GET ALL MEDICINES
         public async Task<List<MedicineResponseDto>> GetAllMedicinesAsync()
         {
             var medicines = await _medicineRepository.GetAllAsync();
@@ -51,6 +54,7 @@ namespace PharmacyAPI.Services
                 MapToDto(m, m.Category?.Name)).ToList();
         }
 
+        // GET MEDICINE BY ID
         public async Task<MedicineResponseDto?> GetMedicineByIdAsync(int id)
         {
             var medicine = await _medicineRepository.GetByIdAsync(id);
@@ -61,6 +65,7 @@ namespace PharmacyAPI.Services
             return MapToDto(medicine, medicine.Category?.Name);
         }
 
+        // UPDATE MEDICINE
         public async Task<MedicineResponseDto?> UpdateMedicineAsync(
             int id, CreateMedicineDto dto)
         {
@@ -88,6 +93,7 @@ namespace PharmacyAPI.Services
             return MapToDto(medicine, category.Name);
         }
 
+        // DELETE MEDICINE
         public async Task<bool> DeleteMedicineAsync(int id)
         {
             var medicine = await _medicineRepository.GetByIdAsync(id);
@@ -100,6 +106,55 @@ namespace PharmacyAPI.Services
             return true;
         }
 
+        // UPDATE MEDICINE STOCK
+        public async Task<StockResponseDto> UpdateStockAsync(
+            int medicineId, UpdateStockDto dto)
+        {
+            var medicine = await _medicineRepository.GetByIdAsync(medicineId);
+
+            if (medicine == null)
+                throw new ArgumentException("Medicine not found.");
+
+            medicine.StockQuantity = dto.StockQuantity;
+
+            medicine.IsAvailable = dto.StockQuantity > 0;
+
+            await _medicineRepository.UpdateAsync(medicine);
+
+            return MapToStockDto(medicine);
+        }
+
+        // GET STOCK DETAILS
+        public async Task<List<StockResponseDto>> GetStockDetailsAsync()
+        {
+            var medicines = await _medicineRepository.GetAllAsync();
+
+            return medicines.Select(MapToStockDto).ToList();
+        }
+
+        // MAP MEDICINE TO STOCK RESPONSE DTO
+        private static StockResponseDto MapToStockDto(Medicine medicine)
+        {
+            string status;
+
+            if (medicine.StockQuantity == 0)
+                status = "Out of Stock";
+            else if (medicine.StockQuantity <= 10)
+                status = "Low Stock";
+            else
+                status = "In Stock";
+
+            return new StockResponseDto
+            {
+                MedicineId = medicine.Id,
+                MedicineName = medicine.Name,
+                StockQuantity = medicine.StockQuantity,
+                IsAvailable = medicine.IsAvailable,
+                StockStatus = status
+            };
+        }
+
+        // MAP MEDICINE TO RESPONSE DTO
         private static MedicineResponseDto MapToDto(
             Medicine medicine, string? categoryName)
         {
